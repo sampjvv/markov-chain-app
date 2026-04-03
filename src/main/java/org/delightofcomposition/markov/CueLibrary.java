@@ -21,7 +21,7 @@ public class CueLibrary {
             Scale.ACOUSTIC,
             new boolean[]{false, true, true, true, true, true},
             new double[]{0.0, 0.1, 0.1, 0.1, 0.1, 0.1},
-            new int[]{0, 0, 0, 0, 1, 1},
+            new double[]{2, 2, 2, 2, 1, 1},
             0.7, 0.9, 0.5));
 
         // Cue 8: Quartal Focus
@@ -30,7 +30,7 @@ public class CueLibrary {
             Scale.NATURAL_MINOR,
             new boolean[]{true, true, true, false, true, true},
             new double[]{0.3, 0.4, 0.5, 0.3, 0.8, 1.0},
-            new int[]{0, 0, 0, 0, 1, 1},
+            new double[]{2, 2, 2, 2, 1, 1},
             0.7, 0.9, 0.5));
 
         // Cue 9: Phrygian
@@ -39,7 +39,7 @@ public class CueLibrary {
             Scale.A_PHRYGIAN,
             new boolean[]{true, false, true, true, false, true},
             new double[]{0.3, 0.3, 0.6, 0.8, 0.3, 0.4},
-            new int[]{2, 0, 1, 2, 0, 0},
+            new double[]{0, 2, 1, 0, 2, 2},
             0.8, 0.7, 0.3));
 
         // Cue 10: Bb Modal
@@ -48,7 +48,7 @@ public class CueLibrary {
             Scale.BB_CUSTOM,
             new boolean[]{true, true, false, true, false, true},
             new double[]{0.3, 0.6, 0.3, 0.4, 0.3, 0.8},
-            new int[]{2, 2, 0, 1, 0, 0},
+            new double[]{0, 0, 2, 1, 2, 2},
             0.8, 0.7, 0.3));
 
         // Cue 11: A Natural Minor
@@ -57,7 +57,7 @@ public class CueLibrary {
             Scale.NATURAL_MINOR,
             new boolean[]{true, true, true, true, true, false},
             new double[]{0.9, 0.8, 0.4, 0.3, 0.5, 0.3},
-            new int[]{2, 1, 1, 2, 2, 0},
+            new double[]{0, 1, 1, 0, 0, 2},
             0.8, 0.7, 0.3));
 
         // Cue 11.1: A Minor - Building (final state of the gradual transition)
@@ -66,7 +66,7 @@ public class CueLibrary {
             Scale.NATURAL_MINOR,
             new boolean[]{true, true, true, true, true, false},
             new double[]{0.8, 0.9, 0.7, 0.6, 0.9, 0.3},
-            new int[]{1, 0, 1, 2, 2, 0},
+            new double[]{1, 2, 1, 0, 0, 2},
             0.5, 0.1, 0.3));
 
         // Cue 12: Ab-Bb Modal
@@ -75,7 +75,7 @@ public class CueLibrary {
             Scale.AB_BB_MODAL,
             new boolean[]{true, true, true, true, true, false},
             new double[]{0.8, 0.9, 0.7, 0.6, 0.4, 0.3},
-            new int[]{1, 0, 1, 2, 2, 0},
+            new double[]{1, 2, 1, 0, 0, 2},
             0.5, 0.1, 0.3));
 
         // Cue 13: Sharp Keys - Dense
@@ -84,7 +84,7 @@ public class CueLibrary {
             Scale.FSHARP_CENTRIC,
             new boolean[]{true, true, true, true, true, false},
             new double[]{1.0, 0.9, 0.7, 0.4, 0.1, 0.3},
-            new int[]{0, 1, 1, 2, 2, 0},
+            new double[]{2, 1, 1, 0, 0, 2},
             0.9, 0.7, 0.5));
 
         // Cue 11.2: Ending (final state)
@@ -93,7 +93,7 @@ public class CueLibrary {
             Scale.NATURAL_MINOR,
             new boolean[]{true, true, true, false, true, false},
             new double[]{0.8, 0.9, 0.7, 0.3, 0.9, 0.3},
-            new int[]{1, 1, 0, 0, 1, 0},
+            new double[]{1, 1, 2, 2, 1, 2},
             0.7, 0.6, 0.5));
     }
 

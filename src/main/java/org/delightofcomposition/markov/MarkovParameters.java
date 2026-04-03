@@ -38,12 +38,9 @@ public class MarkovParameters {
     private double sineAdd = 0.5;                // offset
     private long sineStartTime = 0;
 
-    // Rhythm tables (durations in seconds at tempo=1)
-    public static final double[][] RHYTHMS = {
-        {0.1, 0.4/3.0, 0.16, 0.2},   // rate 0: fast
-        {0.2, 0.3, 0.4},              // rate 1: medium
-        {2.0/3.0, 0.8, 1.0}           // rate 2: slow
-    };
+    // Continuous rate: 0.0 = slow (~1.0s), 2.0 = fast (~0.1s)
+    private static final double DURATION_SLOW = 1.0;
+    private static final double DURATION_FAST = 0.1;
 
     private final List<ChangeListener> listeners = new ArrayList<>();
 
@@ -63,7 +60,7 @@ public class MarkovParameters {
         scale = cue.getScale();
         boolean[] active = cue.getActive();
         double[] amps = cue.getAmplitudes();
-        int[] rates = cue.getRateLevels();
+        double[] rates = cue.getRateLevels();
         for (int i = 0; i < 6; i++) {
             strata[i].setActive(active[i]);
             strata[i].setAmplitude(amps[i]);
@@ -79,7 +76,7 @@ public class MarkovParameters {
     public Cue createCue(String name) {
         boolean[] active = new boolean[6];
         double[] amps = new double[6];
-        int[] rates = new int[6];
+        double[] rates = new double[6];
         for (int i = 0; i < 6; i++) {
             active[i] = strata[i].isActive();
             amps[i] = strata[i].getAmplitude();
@@ -89,11 +86,14 @@ public class MarkovParameters {
                        reverbRoom, reverbMix, reverbDamp);
     }
 
-    /** Pick a random duration from the rhythm table for a given rate level. */
-    public double getRandomDuration(int rateLevel) {
-        double[] rhythms = RHYTHMS[rateLevel];
-        int idx = (int)(Math.random() * rhythms.length);
-        return rhythms[idx] / tempo;
+    /** Continuous duration from rate level. 0.0=slow, 2.0=fast. Exponential mapping with random variation. */
+    public double getRandomDuration(double rateLevel) {
+        // Exponential interpolation: slow (1.0s) → fast (0.1s)
+        double t = Math.max(0, Math.min(2, rateLevel)) / 2.0;
+        double center = DURATION_SLOW * Math.pow(DURATION_FAST / DURATION_SLOW, t);
+        // ±30% random variation for natural feel
+        double variation = 0.7 + Math.random() * 0.6;
+        return (center * variation) / tempo;
     }
 
     // Getters

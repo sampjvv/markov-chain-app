@@ -14,7 +14,7 @@ public class Stratum {
     private boolean active;
     private double amplitude;
     private double currentAmplitude; // smoothed amplitude (lag)
-    private int rateLevel; // 0=fast, 1=medium, 2=slow
+    private double rateLevel; // 0.0=slow, 1.0=medium, 2.0=fast (continuous)
     private final int octaveBase;
     private final int index;
 
@@ -25,7 +25,7 @@ public class Stratum {
         this.active = false;
         this.amplitude = 0.5;
         this.currentAmplitude = 0.5;
-        this.rateLevel = 0;
+        this.rateLevel = 0.0;
     }
 
     /**
@@ -55,6 +55,6 @@ public class Stratum {
     public double getAmplitude() { return amplitude; }
     public void setAmplitude(double amplitude) { this.amplitude = amplitude; }
     public double getCurrentAmplitude() { return currentAmplitude; }
-    public int getRateLevel() { return rateLevel; }
-    public void setRateLevel(int rateLevel) { this.rateLevel = Math.max(0, Math.min(2, rateLevel)); }
+    public double getRateLevel() { return rateLevel; }
+    public void setRateLevel(double rateLevel) { this.rateLevel = Math.max(0.0, Math.min(2.0, rateLevel)); }
 }

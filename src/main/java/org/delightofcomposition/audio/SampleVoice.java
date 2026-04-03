@@ -18,17 +18,21 @@ public class SampleVoice {
     private long sampleCount;      // for envelope
     private boolean alive;
     private double pan;            // -1 to 1
+    private int stratumIndex = -1;
+    private double currentEnvelope;
 
     public SampleVoice() {
         this.alive = false;
     }
 
     /** Initialize/reuse this voice for a new note. */
-    public void trigger(double frequency, double amplitude, double pan, double origFreq) {
+    public void trigger(double frequency, double amplitude, double pan, double origFreq, int stratumIndex) {
+        this.stratumIndex = stratumIndex;
         this.position = 0;
-        // Rate = target frequency / sample's original frequency
-        // e.g., for 440 Hz target from 880 Hz sample: rate = 0.5 (half speed, octave down)
-        this.playbackRate = frequency / origFreq;
+        // SC multiplies freq by 4.0 to shift all strata up 2 octaves into audible range.
+        // Without this, stratum 0 (C3) produces 32 Hz — inaudible on most speakers.
+        // With it: stratum 0 sounds at ~131 Hz (C3), stratum 5 at ~8kHz (C9).
+        this.playbackRate = (frequency * 4.0) / origFreq;
         // Scale amplitude to prevent clipping with many concurrent voices
         this.amplitude = amplitude * 0.15;
         this.sampleCount = 0;
@@ -74,6 +78,7 @@ public class SampleVoice {
             double frac = position - idx;
             double sample = sampleData[idx] * (1.0 - frac) + sampleData[idx + 1] * frac;
 
+            currentEnvelope = env;
             double output = sample * env * amplitude;
 
             // Stereo panning (constant power)
@@ -89,5 +94,8 @@ public class SampleVoice {
     }
 
     public boolean isAlive() { return alive; }
-    public void kill() { alive = false; }
+    public void kill() { alive = false; stratumIndex = -1; }
+    public int getStratumIndex() { return stratumIndex; }
+    public double getAmplitude() { return amplitude; }
+    public double getEnvelope() { return currentEnvelope; }
 }

@@ -141,15 +141,14 @@ public class MarkovMainWindow extends JFrame {
         transportPanel.setCueLoadListener(this::onCueLoaded);
         libraryPanel.setCueLoadListener(this::onCueLoaded);
 
-        engine.setNoteListener((stratumIndex, noteIndex, noteName) -> {
-            SwingUtilities.invokeLater(() -> strataPanel.triggerNote(stratumIndex, noteName));
-        });
+        strataPanel.setEngine(engine);
 
         setJMenuBar(createMenuBar());
 
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                strataPanel.stopMetering();
                 spectrumPanel.stop();
                 engine.stop();
                 System.exit(0);
@@ -161,9 +160,11 @@ public class MarkovMainWindow extends JFrame {
         if (play) {
             engine.start();
             spectrumPanel.start();
+            strataPanel.startMetering();
         } else {
             engine.stop();
             spectrumPanel.stop();
+            strataPanel.stopMetering();
         }
     }
 

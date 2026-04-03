@@ -42,6 +42,10 @@ public class MarkovAudioEngine {
     // Spectrum analyzer for visualization
     private final SpectrumAnalyzer spectrumAnalyzer;
 
+    // Per-stratum level metering (float for atomic reads from EDT)
+    private final float[] stratumLevel = new float[6];
+    private static final float LEVEL_DECAY = 0.92f;
+
     // Callback for UI note indicator updates
     private volatile NoteListener noteListener;
 
@@ -90,9 +94,12 @@ public class MarkovAudioEngine {
     public synchronized void stop() {
         shouldRun.set(false);
 
-        // Kill all voices immediately
+        // Kill all voices and reset meters
         for (SampleVoice voice : voices) {
             voice.kill();
+        }
+        for (int s = 0; s < 6; s++) {
+            stratumLevel[s] = 0;
         }
 
         // Wait for audio thread to finish
@@ -138,6 +145,25 @@ public class MarkovAudioEngine {
                 for (SampleVoice voice : voices) {
                     if (voice.isAlive()) {
                         voice.render(sampleData, sampleLength, mixBufferL, mixBufferR, BUFFER_SIZE);
+                    }
+                }
+
+                // Per-stratum level metering
+                float[] blockLevel = new float[6];
+                for (SampleVoice voice : voices) {
+                    if (voice.isAlive()) {
+                        int si = voice.getStratumIndex();
+                        if (si >= 0 && si < 6) {
+                            float vl = (float)(voice.getAmplitude() * voice.getEnvelope());
+                            if (vl > blockLevel[si]) blockLevel[si] = vl;
+                        }
+                    }
+                }
+                for (int s = 0; s < 6; s++) {
+                    if (blockLevel[s] > stratumLevel[s]) {
+                        stratumLevel[s] = blockLevel[s];
+                    } else {
+                        stratumLevel[s] *= LEVEL_DECAY;
                     }
                 }
 
@@ -206,7 +232,7 @@ public class MarkovAudioEngine {
                 double amp = stratum.smoothAmplitude();
                 double pan = (Math.random() - 0.5) * 0.6;
 
-                spawnVoice(freq, amp, pan);
+                spawnVoice(freq, amp, pan, s);
 
                 NoteListener listener = noteListener;
                 if (listener != null) {
@@ -221,15 +247,15 @@ public class MarkovAudioEngine {
         }
     }
 
-    private void spawnVoice(double freq, double amplitude, double pan) {
+    private void spawnVoice(double freq, double amplitude, double pan, int stratumIndex) {
         double origFreq = sampleBank.getOrigFreq();
         for (SampleVoice voice : voices) {
             if (!voice.isAlive()) {
-                voice.trigger(freq, amplitude, pan, origFreq);
+                voice.trigger(freq, amplitude, pan, origFreq, stratumIndex);
                 return;
             }
         }
-        voices[0].trigger(freq, amplitude, pan, origFreq);
+        voices[0].trigger(freq, amplitude, pan, origFreq, stratumIndex);
     }
 
     public boolean isRunning() {
@@ -238,6 +264,10 @@ public class MarkovAudioEngine {
 
     public SpectrumAnalyzer getSpectrumAnalyzer() {
         return spectrumAnalyzer;
+    }
+
+    public float getStratumLevel(int index) {
+        return (index >= 0 && index < 6) ? stratumLevel[index] : 0;
     }
 
     public int getActiveVoiceCount() {
